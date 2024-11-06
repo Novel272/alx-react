@@ -1,11 +1,14 @@
 table {
-    border: 2px solid #b7b2b2;
     width: 100%;
+    margin: 0 auto;
+    border: 1px solid black;
 }
+
 th {
-    border-bottom: 2px solid #b7b2b2;
+    border-bottom: 1px solid black;
     text-align: left;
 }
-th[colspan='2'] {
+
+th[colspan="2"]{
     text-align: center;
 }

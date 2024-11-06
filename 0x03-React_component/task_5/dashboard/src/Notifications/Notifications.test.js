@@ -1,88 +1,72 @@
-import React from "react";
-// import { shallow } from "enzyme";
-import { render, screen } from "@testing-library/react";
+import React from 'react';
 import Notifications from "./Notifications";
-import { getLatestNotification } from "../utils";
+import NotificationItem from "./NotificationItem";
+import { listNotifications } from '../App/App';
+import { shallow } from 'enzyme';
 
-/*
-test that Notifications renders without crashing
-verify that Notifications renders three list items
-verify that Notifications renders the text Here is the list of notifications
- */
+const notifLength = listNotifications.length
+const wrapper = shallow(<Notifications displayDrawer={true} listNotifications={listNotifications}/>);
+describe(`Notifications Component when displayDrawer prop is true
+and listNotifications prop is not empty`, () => {
+  it("renders without crashing", () => {
+    wrapper
+  })
 
-// describe("Notification component tests", () => {
-//     let notification;
-//     beforeEach(() => {
-//         // notification = shallow(<Notifications />)
-//         notification = shallow(<Notifications />)
-//     })
-//   it("renders Notification component without crashing", () => {
-//     expect(notification).toBeDefined();
-//   });
+  it("renders Notifications div", () => {
+    expect(wrapper.find('.Notifications').exists()).toEqual(true)
+  })
 
-//   it("renders ul", () => {
-//     expect(notification.find("ul")).toBeDefined();
-//   });
+  it("renders three list items", () => {
+    expect(wrapper.find('ul').children().length).toEqual(notifLength);
+  })
 
-//   it("renders three list items", () => {
-//     expect(notification.find("li")).toHaveLength(3);
-//   });
+  it("renders the text: 'Here is the list of notifications:'", () => {
+    expect(wrapper.containsMatchingElement(<p>Here is the list of notifications:</p>)).toEqual(true);
+  })
 
-//   it("renders correct text", () => {
-//     expect(notification.find("p").text()).toBe("Here is the list of notifications");
-//   });
-// });
+  it("renders first NotificationItem element with the right html", () => {
+    const firstChild = wrapper.find('ul').children().first();
+    // console.log(firstChild.html())
+    expect(firstChild.html()).toBe('<li data-notification-type="default">New course available</li>');
+  })
 
-const notificationsList = [
-  {id: 1, value: 'New course available', type:'default'},
-  {id: 2, value: 'New resume available', type:'urgent'},
-  {id: 3, html: getLatestNotification, type:'urgent'},
-]
+  it("renders div with menuItem class", () => {
+    expect(wrapper.find('.menuItem').exists()).toEqual(true)
+  })
 
-test('Notifications component renders without crashing', () => {
-  render(<Notifications  displayDrawer={true} listNotifications={notificationsList} />)
-  expect(screen.getByText('Here is the list of notifications')).toBeInTheDocument()
+  afterEach(() => {
+    jest.restoreAllMocks();
+  });
+
+  it('console logs right message when markAsRead method is called', () => {
+    const log = jest.spyOn(console, "log").mockImplementation(() => {});
+    wrapper.instance().markAsRead(2)
+    expect(log).toBeCalledWith("Notification 2 has been marked as read");
+
+  })
 })
 
-test("Notifications renders ul", () => {
-  render(<Notifications displayDrawer={true} listNotifications={notificationsList} />)
-  expect(screen.getByRole('list')).toBeDefined();
-});
+const wrapper2 = shallow(<Notifications displayDrawer={true}/>);
+describe(`Notifications Component when displayDrawer prop is true
+and listNotifications prop is empty (or not used)`, () => {
+  it("renders without crashing", () => {
+    wrapper2
+  })
 
-test("Notifications renders three list items", () => {
-  render(<Notifications displayDrawer={true} listNotifications={notificationsList} />)
-  expect(screen.getAllByRole('listitem').length).toBe(3);
-});
+  it("renders the text: 'No new notification for now'", () => {
+    expect(wrapper2.containsMatchingElement(<p>No new notification for now</p>)).toEqual(true);
+  })
 
-test("Notifications renders three  NotificationItem instances", () => {
-  render(<Notifications displayDrawer={true} listNotifications={notificationsList} />)
-  // expect(screen.getByTestId('child')).toBeInTheDocument() -> how can I access child components?
-});
-
-test('NotificationItem renders menuItem when displayDrawer is false', () => {
-  render(<Notifications />)
-  expect(screen.getByText('Your notifications')).toBeDefined()
 })
 
-test('NotificationItem renders menuItem when displayDrawer is true', () => {
-  render(<Notifications displayDrawer={true} listNotifications={notificationsList} />)
-  expect(screen.getByText('Your notifications')).toBeDefined()
-})
+const wrapper_displayFalse = shallow(<Notifications displayDrawer={false}/>);
+describe('Notifications Component when displayDrawer prop is false', () => {
+  it("renders div with menuItem class", () => {
+    expect(wrapper.find('.menuItem').exists()).toEqual(true)
+  })
 
-test('Notifications renders correctly with no notificationsList passed', () => {
-  render(<Notifications />)
-  expect(screen.getByText('No new notifications for now')).toBeInTheDocument()
-  expect(screen.queryByText('Here is the list of notifications')).not.toBeInTheDocument()
-})
+  it("does not render Notifications div", () => {
+    expect(wrapper_displayFalse.find('.Notifications').exists()).toEqual(false)
+  })
 
-test('Notifications renders correctly with an empty notifications array passed', () => {
-  render(<Notifications listNotifications={[]}/>)
-  expect(screen.getByText('No new notifications for now')).toBeInTheDocument()
-  expect(screen.queryByText('Here is the list of notifications')).not.toBeInTheDocument()
-})
-
-test('Notifications renders correctly', () => {
-  render(<Notifications listNotifications={notificationsList}/>)
-  expect(screen.queryByText('No new notifications for now')).not.toBeInTheDocument()
-  expect(screen.getByText('Here is the list of notifications')).toBeInTheDocument()
 })

@@ -1,23 +1,29 @@
-import React from 'react'
-import {render, screen} from '@testing-library/react'
-import CourseList from './CourseList'
+import React from 'react';
+import CourseList from './CourseList';
+import { listCourses } from '../App/App';
+import { shallow } from 'enzyme';
 
-const coursesList = [{id: 1, name: 'ES6', credit: 60},
-{id: 2, name: 'Webpack', credit: 20},
-{id: 3, name: 'React', credit: 40}]
+const wrapper = shallow(<CourseList/>)
+describe('CourseList component when listCourses prop is empty/not specified', () => {
+  it('renders without crashing', () => {
+   shallow(<CourseList/>)
+  })
 
-test('CourseList renders without crashing', () => {
-    render(<CourseList listCourses={coursesList}/>)
-    expect(Number(screen.getAllByRole('row').length) > 1).toBeTruthy()
+  it('renders the 2 headings', () => {
+    expect(wrapper.find('table thead').children().length).toEqual(2);
+  })
 })
 
-test('CourseList renders 5 rows with list provided', () => {
-    render(<CourseList listCourses={coursesList}/>)
-    expect(Number(screen.getAllByRole('row').length)).toBe(5)
-})
+const wrapper2 = shallow(<CourseList listCourses={listCourses}/>)
+const coursesLength = listCourses.length
+describe('CourseList component when listCourses prop is empty/not specified', () => {
+  it('renders without crashing', () => {
+   shallow(<CourseList/>)
+  })
 
-test('CourseList renders correctly with list not provided', () => {
-    render(<CourseList listCourses={[]}/>)
-    expect(Number(screen.getAllByRole('row').length)).toBe(1)
-    expect(screen.getByText('No courses available yet')).toBeInTheDocument()
+
+  it('renders the 5 different rows', () => {
+    expect(wrapper2.find('table thead').children().length).toEqual(2);
+    expect(wrapper2.find('table tbody').children().length).toEqual(coursesLength);
+  })
 })
